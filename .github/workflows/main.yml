@@ -59,14 +59,13 @@ jobs:
 
   deploy-oc:
     runs-on: ubuntu-latest
-      steps:
-
-        - name: OpenShift Action publish images
-          uses: redhat-developer/openshift-actions@v1.1
-          with:
-            version: '0.0.1'
-            openshift_server_url: ${{secrets.OPENSHIFT_SERVER_URL}}
-            parameters: '{"username": "${{ secrets.USERNAME }}", "password": "${{ secrets.PASSWORD }}", "acceptUntrustedCerts": "true"}'
-            cmd: |
-              oc project addgreen-fileupload
-              oc import-image  --confirm addgreen-fileupload:0.0.1
+    steps:
+      - name: OpenShift Action publish images
+        uses: redhat-developer/openshift-actions@v1.1
+        with:
+          version: '0.0.1'
+          openshift_server_url: ${{secrets.OPENSHIFT_SERVER_URL}}
+          parameters: '{"username": "${{ secrets.USERNAME }}", "password": "${{ secrets.PASSWORD }}", "acceptUntrustedCerts": "true"}'
+          cmd: |
+            oc project addgreen-fileupload
+            oc import-image  --confirm addgreen-fileupload:0.0.1
