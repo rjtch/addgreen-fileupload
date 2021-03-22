@@ -55,7 +55,7 @@ jobs:
         name: artifact
     - name: Build Docker container
       run: |
-        mkdir -p github-actions-java-maven/target
+        mkdir -p addgreen-fileupload/target
         mv artifact/fileupload-0.0.1-SNAPSHOT.jar addgreen-fileupload/target
         docker build -t addgreen-fileupload:0.0.1 addgreen-fileupload
     - name: Docker login
