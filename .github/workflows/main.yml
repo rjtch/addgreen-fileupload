@@ -42,8 +42,6 @@ jobs:
       with:
         name: artifact
         path: target/fileupload-0.0.1-SNAPSHOT.jar
-    - name: Publish artifact on GitHub Packages
-      run: mvn -B clean deploy -DskipTests
 
   docker:
     name: Publish Docker Image
