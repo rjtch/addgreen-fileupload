@@ -47,27 +47,28 @@ jobs:
   deploy-image:
     runs-on: ubuntu-latest
     steps:
-          - uses: actions/checkout@v1
-          - name: Run build
-             run: make books-api
-          - name: Docker login
-             run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-          - name: Build
-             run: make server
-          - name: Tags
-             run: |
-                docker tag addgreen-fileupload ${{ secrets.DOCKERHUB_USERNAME }}/addgreen-fileupload:0.0.1
-          - name: Push
-             run: |
-                docker push ${{ secrets.DOCKERHUB_USERNAME }}/addgreen-fileupload:0.0.1
+      - uses: actions/checkout@v1
+      - name: Run build
+          run: make books-api
+      - name: Docker login
+          run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build
+          run: make server
+      - name: Tags
+          run: docker tag addgreen-fileupload ${{ secrets.DOCKERHUB_USERNAME }}/addgreen-fileupload:0.0.1
+      - name: Push
+          run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/addgreen-fileupload:0.0.1
 
   deploy-oc:
-    - name: OpenShift Action publish images
-        uses: redhat-developer/openshift-actions@v1.1
-        with:
-          version: 'latest'
-          openshift_server_url: ${{secrets.OPENSHIFT_SERVER_URL}}
-          parameters: '{"username": "${{ secrets.USERNAME }}", "password": "${{ secrets.PASSWORD }}", "acceptUntrustedCerts": "true"}'
-          cmd: |
-            oc project addgreen-fileupload
-            oc import-image  --confirm addgreen-fileupload:0.0.1
+    runs-on: ubuntu-latest
+      steps:
+
+        - name: OpenShift Action publish images
+          uses: redhat-developer/openshift-actions@v1.1
+          with:
+            version: '0.0.1'
+            openshift_server_url: ${{secrets.OPENSHIFT_SERVER_URL}}
+            parameters: '{"username": "${{ secrets.USERNAME }}", "password": "${{ secrets.PASSWORD }}", "acceptUntrustedCerts": "true"}'
+            cmd: |
+              oc project addgreen-fileupload
+              oc import-image  --confirm addgreen-fileupload:0.0.1
