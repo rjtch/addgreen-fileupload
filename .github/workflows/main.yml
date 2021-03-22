@@ -10,17 +10,14 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [ 11, 12, 13 ]
-    name: Java ${{ matrix.java }} compile
+    name: Java compile
     steps:
       - uses: actions/checkout@master
       - name: Setup java
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java }}
-      - run: mvn -f github-actions-java-maven/pom.xml clean compile
+          java-version: 1.11
+      - run: mvn -f addgreen-fileupload/pom.xml clean compile
   
   build:
     runs-on: ubuntu-latest
@@ -39,12 +36,12 @@ jobs:
       with:
         java-version: 11
     - name: Build and test project
-      run: mvn -f github-actions-java-maven/pom.xml clean verify
+      run: mvn -f addgreen-fileupload/pom.xml  clean verify
     - name: Upload Maven build artifact
       uses: actions/upload-artifact@v1
       with:
         name: artifact
-        path: github-actions-java-maven/target/github-actions-java-maven.jar
+        path: addgreen-fileupload/target/fileupload-0.0.1-SNAPSHOT.jar
         
   deploy: 
     runs-on: ubuntu-latest  
@@ -59,8 +56,8 @@ jobs:
     - name: Build Docker container
       run: |
         mkdir -p github-actions-java-maven/target
-        mv artifact/github-actions-java-maven.jar github-actions-java-maven/target
-        docker build -t addgreen-fileupload:0.0.1 github-actions-java-maven
+        mv artifact/fileupload-0.0.1-SNAPSHOT.jar addgreen-fileupload/target
+        docker build -t addgreen-fileupload:0.0.1 addgreen-fileupload
     - name: Docker login
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: Tags
