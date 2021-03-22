@@ -61,7 +61,7 @@ jobs:
         with:
           java-version: 1.11
       - name: Publish artifact on GitHub Packages
-          run: mvn -B clean deploy -DskipTests
+        run: mvn -B clean deploy -DskipTests
   docker:
     name: Publish Docker Image
     runs-on: ubuntu-latest
