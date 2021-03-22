@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - run: mvn -f addgreen-fileupload/pom.xml clean compile
+      - run: mvn clean compile
   
   build:
     runs-on: ubuntu-latest
@@ -36,7 +36,7 @@ jobs:
       with:
         java-version: 11
     - name: Build and test project
-      run: mvn -f addgreen-fileupload/pom.xml  clean verify
+      run: mvn clean verify
     - name: Upload Maven build artifact
       uses: actions/upload-artifact@v1
       with:
