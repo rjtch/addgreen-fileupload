@@ -18,7 +18,7 @@ jobs:
         with:
           java-version: 1.11
       - run: mvn clean compile
-  
+
   build:
     runs-on: ubuntu-latest
     needs: compile
@@ -46,6 +46,7 @@ jobs:
   artifact:
     name: Publish Artifact
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v1
       - name: Set up JDK
@@ -54,9 +55,11 @@ jobs:
           java-version: 1.11
       - name: Publish artifact on GitHub Packages
         run: mvn -B clean deploy -DskipTests
+
   docker:
     name: Publish Docker Image
     runs-on: ubuntu-latest
+    needs: artifact
     steps:
     - name: Docker login
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
