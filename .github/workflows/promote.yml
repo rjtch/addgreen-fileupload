@@ -7,26 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  deploy-image:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: build image
-        run: make server
-      - name: Docker login
-        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Tags
-        run: docker tag addgreen-fileupload:0.0.1 ${{ secrets.DOCKERHUB_USERNAME }}/addgreen-fileupload:0.0.1
-      - name: Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/addgreen-fileupload:0.0.1
-
   deploy-oc:
       runs-on: ubuntu-latest
       steps:
         - name: OpenShift Action publish images
           uses: redhat-developer/openshift-actions@v1.1
           with:
-            version: '0.0.1'
             openshift_server_url: ${{secrets.OPENSHIFT_SERVER_URL}}
             parameters: '{"username": "${{ secrets.USERNAME }}", "password": "${{ secrets.PASSWORD }}", "acceptUntrustedCerts": "true"}'
             cmd: |
