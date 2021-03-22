@@ -1,0 +1,11 @@
+version: "3.3"
+
+services:
+  addgreen-fileupload:
+    image: "addgreen-fileupload:0.0.1"
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/dri:/dev/dri
+      - ./upload-dir:/usr/app/upload-dir
+    ports:
+      - "8080:8080"
