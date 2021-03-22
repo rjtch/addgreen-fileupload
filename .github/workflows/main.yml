@@ -50,8 +50,12 @@ jobs:
     steps:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
+      with:
+        name: artifact
     - name: docker build
-      run: docker build -t addgreen-fileupload:0.0.1  .
+      run: |
+        mv artifact/fileupload-0.0.1-SNAPSHOT.jar addgreen-fileupload/target
+        docker build -t addgreen-fileupload:0.0.1 addgreen-fileupload
     - name: Docker login
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: Tags
