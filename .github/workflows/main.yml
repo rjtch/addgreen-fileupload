@@ -47,6 +47,8 @@ jobs:
     name: Publish Docker Image
     runs-on: ubuntu-latest
     steps:
+    - name: Docker build
+      run: make server
     - name: Docker login
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: Tags
