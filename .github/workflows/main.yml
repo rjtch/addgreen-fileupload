@@ -64,6 +64,6 @@ jobs:
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Building Docker Image
-        run: docker build -f Dockerfile -t addgreen-fileupload
+        run: docker build -t addgreen-fileupload:0.0.1 -f Dockerfile
       - name: Push
         run: docker push $REPO
