@@ -4,16 +4,15 @@ import de.addgreen.model.FileData;
 import de.addgreen.storage.FileStorageService;
 import de.addgreen.storageException.StorageFileNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 
 @Controller
 @Slf4j
@@ -33,37 +33,36 @@ public class StorageController {
         this.fileStorageService = storageService;
     }
 
-    @GetMapping("/prices/{year}/{month}/{fileName:.+}")
+    @GetMapping("/prices")
     @ResponseBody
-    public ResponseEntity<Resource> getPriceFile(@PathVariable String fileName,
-                                                    @PathVariable String year,
-                                                    @PathVariable String month,
-                                                          HttpServletRequest request,
+    public ResponseEntity<Resource> getPriceFile( @RequestParam(name = "date")
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate date,
+                                                 HttpServletRequest request,
                                                  HttpServletResponse response)  throws IOException{
-        log.warn("Trying to download a set of prices from the file " + fileName + " on " + year + "/" + month);
-        return getResourceResponseEntity(fileName, year, month, request, response);
+        return getResourceResponseEntity(date, request, response);
     }
 
-    @GetMapping("/stations/{year}/{month}/{fileName:.+}")
+    @GetMapping("/stations")
     @ResponseBody
-    public ResponseEntity<Resource> getStationFile(@PathVariable String fileName,
-                                                            @PathVariable String year,
-                                                            @PathVariable String month,
-                                                            HttpServletRequest request,
+    public ResponseEntity<Resource> getStationFile(@RequestParam(name = "date")
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate date,
+                                                   HttpServletRequest request,
                                                    HttpServletResponse response)  throws IOException{
-        log.warn("Trying to download a set of stations from the file " + fileName + "on " + year + "/" + month);
-        return getResourceResponseEntity(fileName, year, month, request, response);
+        return getResourceResponseEntity(date, request, response);
     }
 
-    private ResponseEntity<Resource> getResourceResponseEntity(@PathVariable String fileName,
-                                                               @PathVariable String year,
-                                                               @PathVariable String month,
+    private ResponseEntity<Resource> getResourceResponseEntity(@RequestParam(name = "date")
+                                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate date,
                                                                HttpServletRequest request,
                                                                HttpServletResponse response) throws IOException {
+        String year = StringUtils.leftPad(String.valueOf(date.getYear()), 2, "0");
+        String  month = StringUtils.leftPad(String.valueOf(date.getMonthValue()), 2, "0");
+        String day = StringUtils.leftPad(String.valueOf(date.getDayOfMonth()), 2, "0");
+        String fileName = MessageFormat.format("{0}-prices.csv",day);
         String filePath = MessageFormat.format("{0}/{1}/{2}", year, month, fileName);
         Resource resource = fileStorageService.loadAsResource(filePath);
         String contentType;
-        try {
+        log.info("Trying to download the file " + fileName + " with Status " +  response.getStatus());        try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
             throw new IOException("Could not determine file type.");
@@ -73,8 +72,6 @@ public class StorageController {
             contentType = "application/csv";
         }
 
-        log.info("Trying to download a set of infos from the file " + fileName + " inç "
-                + year + "/" + month + " with Status " + response.getStatus());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +  resource.getFilename() + "\"")
