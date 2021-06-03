@@ -35,7 +35,7 @@ public class StorageController {
 
     @GetMapping("/prices")
     @ResponseBody
-    public ResponseEntity<Resource> getPriceFile( @RequestParam(name = "date")
+    public ResponseEntity<Resource> getPricesFile( @RequestParam(name = "date")
                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate date,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response)  throws IOException{
@@ -44,7 +44,7 @@ public class StorageController {
 
     @GetMapping("/stations")
     @ResponseBody
-    public ResponseEntity<Resource> getStationFile(@RequestParam(name = "date")
+    public ResponseEntity<Resource> getStationsFile(@RequestParam(name = "date")
                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate date,
                                                    HttpServletRequest request,
                                                    HttpServletResponse response)  throws IOException{
@@ -58,11 +58,21 @@ public class StorageController {
         String year = StringUtils.leftPad(String.valueOf(date.getYear()), 2, "0");
         String  month = StringUtils.leftPad(String.valueOf(date.getMonthValue()), 2, "0");
         String day = StringUtils.leftPad(String.valueOf(date.getDayOfMonth()), 2, "0");
-        String fileName = MessageFormat.format("{0}-prices.csv",day);
+
+        String fileName = "";
+        if (request.getRequestURI().contains("prices")) {
+            fileName = MessageFormat.format("{0}-prices.csv",day);
+        } else if (request.getRequestURI().contains("stations")) {
+            fileName = MessageFormat.format("{0}-stations.csv",day);
+        } else {
+            throw new IOException("Path doesn't match");
+        }
+
         String filePath = MessageFormat.format("{0}/{1}/{2}", year, month, fileName);
         Resource resource = fileStorageService.loadAsResource(filePath);
-        String contentType;
-        log.info("Trying to download the file " + fileName + " with Status " +  response.getStatus());        try {
+        String contentType = "";
+
+        try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
             throw new IOException("Could not determine file type.");
@@ -72,6 +82,7 @@ public class StorageController {
             contentType = "application/csv";
         }
 
+        log.info("Trying to download the file " + fileName + " with Status " +  response.getStatus());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +  resource.getFilename() + "\"")

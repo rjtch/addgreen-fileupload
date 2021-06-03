@@ -39,9 +39,8 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfo("Addgreen storage API",
                 "Provides API to download prices and stations list in csv format.</p>" +
-                        "<p>For download the application you have to fill the path the correct way begining with what you want to download</p>" +
-                        " <p>/prices/* or /stations/* following the year the month and the file begining by the day and the type of the file.</p>" +
-                        "<p>For e.g. /prices/2020/01/01-prices.csv or /stations/2020/01/01-stations.csv. Note that we only have data from 2020." +
+                        "<p>To download the application you have to fill the path the correct way beginning the year/month/day</p>" +
+                        "<p>For e.g. 2020/01/01-prices.csv for prices or 2020/01/01-stations.csv for stations. Note that we only have data from year 2020." +
                         " More years will follow.</p>",
                 "0.0.1",
                 "",

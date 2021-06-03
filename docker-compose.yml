@@ -2,10 +2,14 @@ version: "3.3"
 
 services:
   addgreen-fileupload:
-    image: "addgreen-fileupload:0.0.1"
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
-      - /dev/bus/usb:/dev/bus/usb
-      - /dev/dri:/dev/dri
       - ./upload-dir:/usr/app/upload-dir
     ports:
       - "8080:8080"
+
+volumes:
+    upload-dir:
+      driver: local

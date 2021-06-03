@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -16,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,15 +22,22 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileStorageImpl implements FileStorageService{
     private final Path rootLocation;
+    private final String pricesLocation = "prices";
+    private final String stationsLocation = "stations";
 
     @Autowired
     public FileStorageImpl(StorageProperties properties) {
-        properties.setLocation(properties.getLocation() + "/prices");
+        properties.setLocation(properties.getLocation());
         this.rootLocation = Paths.get(properties.getLocation());
     }
 
     @Override
     public Path load(String filename) {
+        if (filename.contains(pricesLocation)) {
+            return rootLocation.resolve(pricesLocation).resolve(filename);
+        } else if (filename.contains(stationsLocation)) {
+            return rootLocation.resolve(stationsLocation).resolve(filename);
+        }
         return rootLocation.resolve(filename);
     }
 
@@ -46,7 +51,6 @@ public class FileStorageImpl implements FileStorageService{
             }
             else {
                 throw new StorageFileNotFoundException("Could not find file: " + filename);
-
             }
         } catch (MalformedURLException e) {
             throw new StorageFileNotFoundException("Could not find file: " + filename, e);
